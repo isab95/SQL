@@ -20,6 +20,21 @@ try {
                 header('Location: ' . $_SERVER['PHP_SELF']);
             }
         }
+
+        //DELETE data(row) from database
+        foreach($results as $row) {
+            $city=$row['ville'];
+            if (isset(_POST[$city]) && _POST[$city] == "on"){
+                echo "hey i'm trying to delete this $city city";
+                $query2 = $pdo->prepare("DELETE FROM weather WHERE ville=:city_delete");
+                $query2->bindParam(":city_delete", $city, PDO::PARAM_STR);
+                if (!$query2->execute()) {
+                    echo "Could not delete city";
+                } else {
+                    header('Location: ' . $_SERVER['PHP_SELF']);
+                }
+            }
+        }
     }
 
 }
@@ -34,6 +49,7 @@ catch(PDOException $e) {
         <table>
             <thead>
                 <tr>
+                    <th></th>
                     <th>City</th>
                     <th>High</th>
                     <th>Low</th>
@@ -44,6 +60,7 @@ catch(PDOException $e) {
                 <?php
                 foreach($results as $row):?>
                     <tr>
+                        <td><input type="checkbox" name="<?php echo $row['ville']; ?>"></td>
                         <td><?php echo $row['ville']; ?></td>
                         <td><?php echo $row['haut']; ?></td>
                         <td><?php echo $row['bas']; ?></td>
@@ -51,11 +68,12 @@ catch(PDOException $e) {
 
                 <?php endforeach; ?>
                 <tr>
+                    <td><button type='submit'>Add</button></td>
                     <td><input type="text" name="city" required></td>
                     <td><input type="number" name="high" required></td>
                     <td><input type="number" name="low" required></td>
                 </tr>
-                    <button type='submit'>Add</button>
+                    
             </tbody>
         </table>
     </form>
